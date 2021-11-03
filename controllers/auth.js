@@ -10,7 +10,6 @@ exports.register = async (req, res, next) => {
       password,
     });
     sendToken(user, 201, res);
-
   } catch (error) {
     next(error);
   }
@@ -40,14 +39,38 @@ exports.login = async (req, res, next) => {
       //? Custom error
       return next(new ErrorResponse("Invalid credential", 401));
     }
-    sendToken(user, 200, res)
+    sendToken(user, 200, res);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-exports.forgotpassword = (req, res, next) => {
-  res.send("Forgot Password Route");
+exports.forgotpassword = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({});
+    if (!user) {
+      return next(new ErrorResponse("Email could not be send", 404));
+    }
+
+    const resetToken = this.getResetPasswordToken();
+
+    await user.save();
+
+    const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
+
+    const message = `
+      <h1>You have requested a password reset</h1>
+      <p>Please go to this link to reset your password</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+    `
+
+    try {
+       
+    } catch (error) {
+      
+    }
+  } catch (error) {}
 };
 
 exports.resetpassword = (req, res, next) => {
